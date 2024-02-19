@@ -15,7 +15,6 @@ namespace finshark.Repository
             _context = context;
         }
 
-
         public async Task<Stock> CreateAsync(Stock stockModel)
         {
             await _context.Stocks.AddAsync(stockModel);
@@ -42,7 +41,7 @@ namespace finshark.Repository
 
         public async Task<List<Stock>> GetAllAsync(QueryObject query)
         {
-            var stocks = _context.Stocks.Include(c => c.Comments).AsQueryable();
+            var stocks = _context.Stocks.Include(c => c.Comments).ThenInclude(a => a.AppUser).AsQueryable();
 
             //if query object "companyName" attribute isn't null or space, get all the stocks that contain the given company name
             if (!string.IsNullOrWhiteSpace(query.CompanyName))
@@ -74,6 +73,11 @@ namespace finshark.Repository
         public async Task<Stock?> GetByIdAsync(int id)
         {
             return await _context.Stocks.Include(c => c.Comments).FirstOrDefaultAsync(i => i.Id == id);
+        }
+
+        public async Task<Stock?> GetBySymbolAsync(string symbol)
+        {
+            return await _context.Stocks.FirstOrDefaultAsync(s => s.Symbol == symbol);
         }
 
         public Task<bool> StockExists(int id)

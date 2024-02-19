@@ -1,4 +1,5 @@
 ﻿using finshark.Data;
+using finshark.Helpers;
 using finshark.Interfaces;
 using finshark.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -21,29 +22,26 @@ namespace finshark.Repository
             return commentModel;
         }
 
-        public async Task<Comment> DeleteAsync(int id)
+        public async Task<List<Comment>> GetAllAsync(CommentQueryObject queryObject)
         {
-            var commentModel = await _context.Comments.FirstOrDefaultAsync(x => x.Id == id);
+            var comments = _context.Comments.Include(a => a.AppUser).AsQueryable();
 
-            if (commentModel == null)
+            if (!string.IsNullOrWhiteSpace(queryObject.Symbol))
             {
-                return null;
+                comments = comments.Where(s => s.Stock.Symbol ==queryObject.Symbol);
+            };
+
+            if(queryObject.IsDescending == true)
+            {
+                comments = comments.OrderByDescending(c => c.CreatedOn);
             }
 
-            _context.Comments.Remove(commentModel);
-            await _context.SaveChangesAsync();
-
-            return commentModel;
-        }
-
-        public async Task<List<Comment>> GetAllAsync()
-        {
-            return await _context.Comments.ToListAsync();
+            return await comments.ToListAsync();
         }
 
         public async Task<Comment?> GetByIdAsync(int id)
         {
-            return await _context.Comments.FindAsync(id);
+            return await _context.Comments.Include(a => a.AppUser).FirstOrDefaultAsync(c => c.Id == id);
         }
 
         public async Task<Comment?> UpdateAsync(int id, Comment commentModel)
@@ -61,6 +59,21 @@ namespace finshark.Repository
             await _context.SaveChangesAsync();
 
             return existingComment;
+        }
+
+        public async Task<Comment> DeleteAsync(int id)
+        {
+            var commentModel = await _context.Comments.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (commentModel == null)
+            {
+                return null;
+            }
+
+            _context.Comments.Remove(commentModel);
+            await _context.SaveChangesAsync();
+
+            return commentModel;
         }
     }
 }
