@@ -51,13 +51,13 @@ namespace finshark.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "d72c66e3-818c-4e54-ac4e-4cd1372c9e77",
+                            Id = "9f3c95ef-7a55-4362-95e2-5844455f460d",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "078c40a8-cc75-4e47-ba52-c349b266bf19",
+                            Id = "8fda3155-cc5e-4bc7-b3ab-b5184fe41afd",
                             Name = "User",
                             NormalizedName = "USER"
                         });
